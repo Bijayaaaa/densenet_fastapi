@@ -17,21 +17,25 @@ app.add_middleware(
 
 @app.on_event("startup")
 async def startup_event():
-    logger.info("🚀 Starting up and loading model...")
+    logger.info(" Starting up and loading model...")
     load_model_once()
 
 @app.get("/")
 async def root():
-    return {"message": "✅ DenseNet FastAPI is running!"}
+    return {"message": "DenseNet FastAPI is running!"}
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    logger.info(f"📁 Received file: {file.filename}")
     try:
         contents = await file.read()
+
+        # ───────────────────────────────
+        # Predict (returns class_name now)
+        # ───────────────────────────────
         result = predict_from_bytes(contents)
-        logger.info(f"📊 Prediction result: {result}")
+
         return JSONResponse(content=result)
+
     except Exception as e:
-        logger.exception("❌ Error handling /predict")
+        logger.exception("Error handling /predict")
         return JSONResponse(content={"error": str(e)}, status_code=500)
